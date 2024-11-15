@@ -1,6 +1,6 @@
 import Fastify, { FastifyInstance } from "fastify";
 import S from "fluent-json-schema";
-import { Observable, Subject } from "rxjs";
+import { Subject } from "rxjs";
 
 interface Order {
   user_id: number;
@@ -13,6 +13,10 @@ interface Order {
 }
 
 const fastify: FastifyInstance = Fastify();
+const orderManagerHostname: string = "";
+const orderManagerPort: number = 3000;
+const orderManagerPath: string = "";
+const orderManagerUrl: string = `${orderManagerHostname}:${orderManagerPort}/${orderManagerPath}`;
 
 const schema = S.object()
   .prop("user_id", S.integer().minimum(0).required())
@@ -24,27 +28,14 @@ const schema = S.object()
   .prop("trader_type", S.string().minLength(1).required());
 
 let startTime: null | Date = null;
-const counterObservable = new Subject<number>();
-let counter = 0;
-const second = 1000;
 const observable = new Subject();
 observable.subscribe((rawData) => {
   const data = rawData as Order;
-  counter++;
-  counterObservable.next(counter);
+  fetch(orderManagerUrl, {
+    body: JSON.stringify(data),
+    method: "POST",
+  });
 });
-
-const interval = setInterval(() => {
-  if (startTime && counter % 1077986 === 0) {
-    const now = new Date();
-    console.log("Start time: " + startTime.toString());
-    console.log("Counter: " + counter);
-    console.log("Current time: " + now.toString());
-    startTime = null;
-  }
-}, 1000);
-
-setTimeout(() => clearInterval(interval), second * 60 * 10);
 
 fastify.post(
   "/place-order",
