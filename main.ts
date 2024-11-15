@@ -50,7 +50,7 @@ fastify.post(
 
 try {
   const port = 3000;
-  fastify.listen({ port: port }, function (err, address) {
+  fastify.listen({ port: port, host: "0.0.0.0" }, function (err, address) {
     if (err) {
       console.error(err);
       process.exit(1);
