@@ -13,10 +13,10 @@ interface Order {
 }
 
 const fastify: FastifyInstance = Fastify();
-const orderManagerHostname: string = "";
+const orderManagerHostname: string = "localhost";
 const orderManagerPort: number = 3000;
 const orderManagerPath: string = "";
-const orderManagerUrl: string = `${orderManagerHostname}:${orderManagerPort}/${orderManagerPath}`;
+const orderManagerUrl: string = `http://${orderManagerHostname}:${orderManagerPort}/${orderManagerPath}`;
 
 const schema = S.object()
   .prop("user_id", S.integer().minimum(0).required())
@@ -27,7 +27,6 @@ const schema = S.object()
   .prop("order_type", S.string().enum(["bid", "ask"]).required())
   .prop("trader_type", S.string().minLength(1).required());
 
-let startTime: null | Date = null;
 const observable = new Subject();
 observable.subscribe((rawData) => {
   const data = rawData as Order;
@@ -46,7 +45,6 @@ fastify.post(
   },
   async function handler(request, _) {
     observable.next(request.body);
-    if (!startTime) startTime = new Date();
   },
 );
 
