@@ -37,16 +37,21 @@ observable.subscribe((rawData) => {
 });
 
 fastify.post(
-  "/place-order",
+  "/",
   {
     schema: {
       body: schema,
     },
   },
-  async function handler(request, _) {
+  async function handler(request, replyTo) {
     observable.next(request.body);
+    replyTo.status(201).send();
   },
 );
+
+fastify.get("/", async (request, replyTo) => {
+  replyTo.send("Client gateway operational");
+});
 
 try {
   const port = 3000;
@@ -54,7 +59,7 @@ try {
     if (err) {
       console.error(err);
       process.exit(1);
-    } else console.log(`Now listening on port ${address}`);
+    } else console.log(`Client gateway listening on port ${address}`);
   });
 } catch (e: any) {
   console.error(e);
