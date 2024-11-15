@@ -13,7 +13,7 @@ interface Order {
 }
 
 const fastify: FastifyInstance = Fastify();
-const orderManagerHostname: string = "localhost";
+const orderManagerHostname: string = "order-manager";
 const orderManagerPort: number = 3000;
 const orderManagerPath: string = "";
 const orderManagerUrl: string = `http://${orderManagerHostname}:${orderManagerPort}/${orderManagerPath}`;
