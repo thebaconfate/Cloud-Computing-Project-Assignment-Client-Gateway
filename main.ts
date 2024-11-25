@@ -18,23 +18,24 @@ const orderManagerPort: number = 3000;
 const orderManagerPath: string = "";
 const orderManagerUrl: string = `http://${orderManagerHostname}:${orderManagerPort}/${orderManagerPath}`;
 
+enum Symbol {
+  AMAZON = "AMZN",
+  APPLE = "AAPL",
+  GOOGLE = "GOOGL",
+  MICROSOFT = "MSFT",
+}
+
 const schema = S.object()
   .prop("user_id", S.integer().minimum(0).required())
   .prop("timestamp_ns", S.integer().minimum(0).required())
   .prop("price", S.number().minimum(0).required())
-  .prop("symbol", S.string().minLength(1).required())
+  .prop(
+    "symbol",
+    S.string().minLength(1).enum(Object.values(Symbol)).required(),
+  )
   .prop("quantity", S.integer().minimum(1).required())
   .prop("order_type", S.string().enum(["bid", "ask"]).required())
   .prop("trader_type", S.string().minLength(1).required());
-
-const observable = new Subject();
-observable.subscribe((rawData) => {
-  const data = rawData as Order;
-  fetch(orderManagerUrl, {
-    body: JSON.stringify(data),
-    method: "POST",
-  });
-});
 
 fastify.post(
   "/",
@@ -44,12 +45,17 @@ fastify.post(
     },
   },
   async function handler(request, replyTo) {
-    observable.next(request.body);
-    replyTo.status(201).send();
+    fetch(orderManagerUrl, {
+      body: JSON.stringify(request.body),
+      method: "POST",
+    }).then((response) => {
+      if (response.ok) replyTo.status(201).send();
+      else replyTo.status(response.status).send();
+    });
   },
 );
 
-fastify.get("/", async (request, replyTo) => {
+fastify.get("/", async (_, replyTo) => {
   replyTo.send("Client gateway operational");
 });
 
