@@ -1,16 +1,5 @@
 import Fastify, { FastifyInstance } from "fastify";
 import S from "fluent-json-schema";
-import { Subject } from "rxjs";
-
-interface Order {
-  user_id: number;
-  timestamp_ns: number;
-  price: number;
-  symbol: string;
-  quantity: number;
-  order_type: string;
-  trader_type: string;
-}
 
 const fastify: FastifyInstance = Fastify();
 const orderManagerHostname: string = "order-manager";
