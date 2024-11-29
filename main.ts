@@ -34,13 +34,19 @@ fastify.post(
     },
   },
   async function handler(request, replyTo) {
+    console.log("Received request");
     fetch(orderManagerUrl, {
       body: JSON.stringify(request.body),
       method: "POST",
-    }).then((response) => {
-      if (response.ok) replyTo.status(201).send();
-      else replyTo.status(response.status).send();
-    });
+    })
+      .then((response) => {
+        if (response.ok) replyTo.status(201).send();
+        else replyTo.status(response.status).send();
+      })
+      .catch((e: any) => {
+        console.error(e);
+        replyTo.status(500).send();
+      });
   },
 );
 
