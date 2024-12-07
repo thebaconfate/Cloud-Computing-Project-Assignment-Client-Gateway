@@ -34,18 +34,18 @@ fastify.post(
     },
   },
   async function handler(request, replyTo) {
-    console.log("Received request");
     fetch(orderManagerUrl, {
       body: JSON.stringify(request.body),
       method: "POST",
+      headers: { "Content-Type": "application/json" },
     })
       .then((response) => {
-        if (response.ok) replyTo.status(201).send();
-        else replyTo.status(response.status).send();
+        if (response.ok) replyTo.code(201).send();
+        else replyTo.code(response.status).send();
       })
       .catch((e: any) => {
         console.error(e);
-        replyTo.status(500).send();
+        replyTo.code(500).send();
       });
   },
 );
