@@ -4,7 +4,7 @@ import S from "fluent-json-schema";
 const fastify: FastifyInstance = Fastify();
 const orderManagerHostname: string = "order-manager";
 const orderManagerPort: number = 3000;
-const orderManagerPath: string = "";
+const orderManagerPath: string = "order";
 const orderManagerUrl: string = `http://${orderManagerHostname}:${orderManagerPort}/${orderManagerPath}`;
 
 enum Symbol {
@@ -34,24 +34,23 @@ fastify.post(
     },
   },
   async function handler(request, replyTo) {
-    fetch(orderManagerUrl, {
-      body: JSON.stringify(request.body),
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => {
-        if (response.ok) replyTo.code(201).send();
-        else replyTo.code(response.status).send();
-      })
-      .catch((e: any) => {
-        console.error(e);
-        replyTo.code(500).send();
+    try {
+      const response = await fetch(orderManagerUrl, {
+        body: JSON.stringify(request.body),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
+      if (response.ok) replyTo.code(201).send();
+      else replyTo.code(response.status).send();
+    } catch (e: any) {
+      console.error(e);
+      replyTo.code(500).send();
+    }
   },
 );
 
 fastify.get("/", async (_, replyTo) => {
-  replyTo.send("Client gateway operational");
+  replyTo.code(200).send("Client gateway operational");
 });
 
 try {
