@@ -14,4 +14,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-ENTRYPOINT ["node", "dist/main.tjs" ]
+ENTRYPOINT ["node", "dist/main.js" ]
